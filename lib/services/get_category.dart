@@ -13,12 +13,13 @@ class Job {
   String url;
   String title;
   String companyName;
+  String category;
 
-  Job({
-    required this.url,
-    required this.title,
-    required this.companyName,
-  });
+  Job(
+      {required this.url,
+      required this.title,
+      required this.companyName,
+      required this.category});
 }
 
 class ApiCalls {
@@ -53,14 +54,13 @@ class ApiCalls {
       String url = 'https://remotive.io/api/remote-jobs?category=' + slug;
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
-        print("success");
         data = jsonDecode(response.body)["jobs"];
-        print(data.length);
         data.forEach((element) {
           jobData.add(Job(
               url: element["url"],
               title: element["title"],
-              companyName: element["company_name"]));
+              companyName: element["company_name"],
+              category: slug));
         });
       } else {
         throw Exception('Failed to load data');

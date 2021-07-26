@@ -6,6 +6,7 @@ import 'package:verstile/providers/select_category.dart';
 
 List<dynamic> catergories = [];
 List<Job> jobs = [];
+String urlSlug = "software-dev";
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -53,7 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
                             return Container(
                               width: MediaQuery.of(context).size.width / 1.1,
                               child: InkWell(
-                                onTap: () async {},
+                                onTap: () async {
+                                  setState(() {
+                                    urlSlug = item.slug;
+                                  });
+                                },
                                 child: Card(
                                   color: Colors.lightBlue[100],
                                   child: Center(child: Text(item.name)),
@@ -79,7 +84,7 @@ class _MyHomePageState extends State<MyHomePage> {
 class CategoryJobs extends StatelessWidget {
   void getJobs(SelectedCategory selectedCategory) async {
     try {
-      jobs = await ApiCalls().fetchJobs();
+      jobs = await ApiCalls().fetchJobs(slug: urlSlug);
     } catch (error) {
       print(error.toString());
     }
@@ -99,22 +104,39 @@ class CategoryJobs extends StatelessWidget {
                   child: SingleChildScrollView(
                     child: Column(
                       children: <Widget>[
+                        // ignore: unnecessary_null_comparison
+                        SizedBox(
+                          height: 15,
+                        ),
+                        // ignore: unnecessary_null_comparison
+                        selectedCategory.data[0].category != null
+                            ? Text(
+                                selectedCategory.data[0].category.toUpperCase(),
+                                style:
+                                    TextStyle(fontSize: 15, color: Colors.blue),
+                              )
+                            : Text("Software Developer"),
+                        SizedBox(
+                          height: 15,
+                        ),
                         for (int i = 0; i < selectedCategory.data.length; i++)
-                          Container(
-                            child: Card(
-                              child: InkWell(
-                                child: Text(selectedCategory.data[i].title +
-                                    " " +
-                                    selectedCategory.data[i].companyName),
-                                onTap: () async {
-                                  String url = selectedCategory.data[i].url;
-                                  if (await canLaunch(url)) {
-                                    await launch(url);
-                                  } else {
-                                    throw "couldnt launch";
-                                  }
-                                },
+                          Card(
+                            color: Colors.white10,
+                            margin: EdgeInsets.all(4.0),
+                            child: InkWell(
+                              child: ListTile(
+                                title: Text(selectedCategory.data[i].title),
+                                subtitle:
+                                    Text(selectedCategory.data[i].companyName),
                               ),
+                              onTap: () async {
+                                String url = selectedCategory.data[i].url;
+                                if (await canLaunch(url)) {
+                                  await launch(url);
+                                } else {
+                                  throw "couldnt launch";
+                                }
+                              },
                             ),
                           )
                       ],
