@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:verstile/providers/get_category.dart';
+import 'package:provider/provider.dart';
+import 'package:verstile/services/get_category.dart';
+import 'package:verstile/providers/select_category.dart';
 
 List<dynamic> catergories = [];
+List<Job> jobs = [];
 
 class MyHomePage extends StatefulWidget {
   MyHomePage({Key? key, required this.title}) : super(key: key);
@@ -32,54 +35,67 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Center(child: Text(widget.title)),
-      ),
-      body: Center(
-        child: catergories.length != 0
-            ? ListView.builder(
-                itemBuilder: (context, index) {
-                  final item = catergories[index];
-                  return ListTile(
-                    title: Text(item.name),
-                    subtitle: Text(item.slug),
-                  );
-                },
-                itemCount: catergories.length,
-              )
-            : CircularProgressIndicator(),
-      ),
-    );
+        appBar: AppBar(
+          title: Center(child: Text(widget.title)),
+        ),
+        body: Column(
+          children: <Widget>[
+            Container(
+              height: MediaQuery.of(context).size.height / 7,
+              child: Center(
+                child: catergories.length != 0
+                    ? ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemBuilder: (context, index) {
+                          final item = catergories[index];
+                          return Container(
+                            width: MediaQuery.of(context).size.width / 1.1,
+                            child: InkWell(
+                              onTap: () async {},
+                              child: Card(
+                                color: Colors.lightBlue[100],
+                                child: Center(child: Text(item.name)),
+                              ),
+                            ),
+                          );
+                        },
+                        itemCount: catergories.length,
+                      )
+                    : CircularProgressIndicator(),
+              ),
+            ),
+            SizedBox(
+              width: MediaQuery.of(context).size.height / 10,
+            ),
+            CategoryJobs(),
+          ],
+        ));
   }
 }
 
-// class DemoApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Scaffold(
-//       appBar: new AppBar(title: new Text('Nested ListView Example')),
-//       body: new Center(
-//         child: new ListView(
-//           children: <Widget>[
-//             new Container(
-//               height: 80.0,
-//               child: new ListView(
-//                 scrollDirection: Axis.horizontal,
-//                 children: new List.generate(10, (int index) {
-//                   return new Card(
-//                     color: Colors.blue[index * 100],
-//                     child: new Container(
-//                       width: 50.0,
-//                       height: 50.0,
-//                       child: new Text("$index"),
-//                     ),
-//                   );
-//                 }),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+class CategoryJobs extends StatelessWidget {
+  void getJobs(SelectedCategory selectedCategory) async {
+    try {
+      jobs = await ApiCalls().fetchJobs();
+    } catch (error) {
+      print(error.toString());
+    }
+    selectedCategory.setcategory(jobs);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    SelectedCategory selectedCategory =
+        Provider.of<SelectedCategory>(context, listen: false);
+    getJobs(selectedCategory);
+    return Consumer<SelectedCategory>(
+      builder: (context, value, child) {
+        return Center(
+          child: selectedCategory.data.length != 0
+              ? Text(selectedCategory.data.length.toString())
+              : CircularProgressIndicator(),
+        );
+      },
+    );
+  }
+}

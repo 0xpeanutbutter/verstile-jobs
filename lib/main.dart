@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:verstile/providers/select_category.dart';
 import 'package:verstile/screens/home_page.dart';
 
 void main() {
@@ -13,7 +15,9 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'category'),
+      home: ChangeNotifierProvider(
+          create: (context) => SelectedCategory(),
+          child: MyHomePage(title: 'category')),
     );
   }
 }
