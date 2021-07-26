@@ -1,9 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-List<Category> catergoryData = [];
-List<Job> jobData = [];
-
 class Category {
   int id;
   String name;
@@ -27,6 +24,8 @@ class Job {
 class ApiCalls {
   Future<List> fetchCategories() async {
     List data = [];
+    List<Category> catergoryData = [];
+
     try {
       const url = 'https://remotive.io/api/remote-jobs/categories';
       final response = await http.get(Uri.parse(url));
@@ -48,6 +47,8 @@ class ApiCalls {
 
   Future<List<Job>> fetchJobs({String slug = "software-dev"}) async {
     List data = [];
+    List<Job> jobData = [];
+
     try {
       String url = 'https://remotive.io/api/remote-jobs?category=' + slug;
       final response = await http.get(Uri.parse(url));

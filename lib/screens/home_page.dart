@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:verstile/services/get_category.dart';
 import 'package:verstile/providers/select_category.dart';
 
@@ -38,37 +39,39 @@ class _MyHomePageState extends State<MyHomePage> {
         appBar: AppBar(
           title: Center(child: Text(widget.title)),
         ),
-        body: Column(
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height / 7,
-              child: Center(
-                child: catergories.length != 0
-                    ? ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemBuilder: (context, index) {
-                          final item = catergories[index];
-                          return Container(
-                            width: MediaQuery.of(context).size.width / 1.1,
-                            child: InkWell(
-                              onTap: () async {},
-                              child: Card(
-                                color: Colors.lightBlue[100],
-                                child: Center(child: Text(item.name)),
+        body: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+                height: MediaQuery.of(context).size.height / 7,
+                child: Center(
+                  child: catergories.length != 0
+                      ? ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemBuilder: (context, index) {
+                            final item = catergories[index];
+                            return Container(
+                              width: MediaQuery.of(context).size.width / 1.1,
+                              child: InkWell(
+                                onTap: () async {},
+                                child: Card(
+                                  color: Colors.lightBlue[100],
+                                  child: Center(child: Text(item.name)),
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        itemCount: catergories.length,
-                      )
-                    : CircularProgressIndicator(),
+                            );
+                          },
+                          itemCount: catergories.length,
+                        )
+                      : CircularProgressIndicator(),
+                ),
               ),
-            ),
-            SizedBox(
-              width: MediaQuery.of(context).size.height / 10,
-            ),
-            CategoryJobs(),
-          ],
+              SizedBox(
+                width: MediaQuery.of(context).size.height / 10,
+              ),
+              CategoryJobs(),
+            ],
+          ),
         ));
   }
 }
@@ -92,7 +95,32 @@ class CategoryJobs extends StatelessWidget {
       builder: (context, value, child) {
         return Center(
           child: selectedCategory.data.length != 0
-              ? Text(selectedCategory.data.length.toString())
+              ? Container(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: <Widget>[
+                        for (int i = 0; i < selectedCategory.data.length; i++)
+                          Container(
+                            child: Card(
+                              child: InkWell(
+                                child: Text(selectedCategory.data[i].title +
+                                    " " +
+                                    selectedCategory.data[i].companyName),
+                                onTap: () async {
+                                  String url = selectedCategory.data[i].url;
+                                  if (await canLaunch(url)) {
+                                    await launch(url);
+                                  } else {
+                                    throw "couldnt launch";
+                                  }
+                                },
+                              ),
+                            ),
+                          )
+                      ],
+                    ),
+                  ),
+                )
               : CircularProgressIndicator(),
         );
       },
